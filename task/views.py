@@ -81,7 +81,17 @@ class TaskView(APIView):
         task = Task.objects.get(pk=id, assignee=request.user)
         task.delete()
         return Response("Deleted", status=status.HTTP_200_OK)
-    
+
+class AdminTasksView(APIView):
+    authentication_classes = (UserAuthentication,)
+    permission_classes = (UserAccessPermission,)
+
+    def get(self, request):
+        tasks = Task.objects.all()
+        qs_json = serializers.serialize('json', tasks)
+
+        return Response(qs_json, status=status.HTTP_200_OK)
+
 class AdminTaskView(APIView):
     authentication_classes = (UserAuthentication,)
     permission_classes = (UserAccessPermission,)
