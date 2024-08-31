@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,6 +27,16 @@ class RegistrationView(APIView):
     ))
     @transaction.atomic()
     def post(self, request):
+        email = request.data.get('email', None)
+        UserModel = get_user_model()
+
+        try:
+            users = UserModel.objects.filter(email=email)
+            if (len(users) >= 1):
+                return Response("Email exist", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except UserModel.DoesNotExist:
+            pass
+
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -47,15 +57,22 @@ class LoginView(APIView):
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT, 
         properties={
-            'username': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
             'password': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
         }
     ))
     def post(self, request):
-        username = request.data.get('username', None)
+        email = request.data.get('email', None)
         password = request.data.get('password', None)
 
-        authenticated_user = authenticate(username=username, password=password)
+        UserModel = get_user_model()
+
+        try:
+            user = UserModel.objects.get(email=email)
+        except UserModel.DoesNotExist:
+            return Response("Email not exist", status=status.HTTP_404_NOT_FOUND)
+    
+        authenticated_user = authenticate(username=user.get_username(), password=password)
         if authenticated_user:
             serializer = UserLoginSerializer(authenticated_user)
             return Response(serializer.data, status=status.HTTP_200_OK)
