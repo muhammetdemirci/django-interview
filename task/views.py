@@ -11,6 +11,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.forms.models import model_to_dict
 
+from celery_tasks import send_task_assignment_notification,send_task_update_notification
+
 class TasksView(APIView):
     authentication_classes = (UserAuthentication,)
     permission_classes = (UserAccessPermission,)
@@ -39,6 +41,7 @@ class TasksView(APIView):
             due_date = request.data.get('due_date', None)
             
             task = Task.objects.create(title=title,description=description, status=task_status, assignee=request.user, due_date=due_date)
+            send_task_assignment_notification.delay(request.user.email)
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -72,6 +75,8 @@ class TaskView(APIView):
             task.status = task_status
             task.due_date = due_date
             task.save()
+
+            send_task_update_notification.delay(request.user.email)
 
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -118,6 +123,8 @@ class AdminTaskView(APIView):
             task.status = task_status
             task.due_date = due_date
             task.save()
+            
+            send_task_update_notification.delay(task.user.email)
 
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
