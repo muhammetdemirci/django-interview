@@ -47,7 +47,32 @@ class TaskView(APIView):
     permission_classes = (UserAccessPermission,)
 
     def get(self, request, id):
-        print("id")
         task = Task.objects.get(pk=id, assignee=request.user)
         return Response(model_to_dict(task), status=status.HTTP_200_OK)
+    
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT, 
+        properties={
+            'title': openapi.Schema(type=openapi.TYPE_STRING, description='title'),
+            'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
+            'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
+            'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
+        }
+    ))
+    def post(self, request, id):
+        serializer = TaskSerializer(data=request.data)
+        if serializer.is_valid():
+            title = request.data.get('title', None)
+            description = request.data.get('description', None)
+            task_status = request.data.get('status', None)
+            due_date = request.data.get('due_date', None)
+            task = Task.objects.get(pk=id, assignee=request.user)
+            task.title = title
+            task.description = description
+            task.status = task_status
+            task.due_date = due_date
+            task.save()
+
+            return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
