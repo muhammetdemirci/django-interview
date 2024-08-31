@@ -44,6 +44,7 @@ urlpatterns += [
     re_path(r'^api/auth/login/', auth_views.LoginView.as_view(), name='login'),
     path('api/tasks', task_views.TasksView.as_view()),
     path('api/tasks/<int:id>', task_views.TaskView.as_view()),
+    path('api/admin/tasks/<int:id>', task_views.AdminTaskView.as_view()),
     re_path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
