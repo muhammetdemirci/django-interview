@@ -42,6 +42,7 @@ DEFAULT_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_yasg',
+    'django_crontab'
 ]
 
 LOCAL_APPS = [
@@ -101,6 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CRONJOBS = [
+    ('* * 1 * *', 'cron_jobs.due_date_reminder')
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
