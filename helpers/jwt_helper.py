@@ -27,7 +27,7 @@ class JWTHelper:
                 "username": user.username,
             }
             token = jwt.encode(data, 'secret', algorithm=JWTHelper.JWT_ALGORITHM)
-            return str(token, JWTHelper.JWT_UTF)
+            return token
         raise User.DoesNotExist
 
     @staticmethod
