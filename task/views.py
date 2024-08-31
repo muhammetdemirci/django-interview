@@ -12,10 +12,6 @@ from drf_yasg import openapi
 from django.forms.models import model_to_dict
 
 class TasksView(APIView):
-    """
-        GET /api/tasks/
-    """
-
     authentication_classes = (UserAuthentication,)
     permission_classes = (UserAccessPermission,)
 
@@ -45,3 +41,13 @@ class TasksView(APIView):
             task = Task.objects.create(title=title,description=description, status=task_status, assignee=request.user, due_date=due_date)
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TaskView(APIView):
+    authentication_classes = (UserAuthentication,)
+    permission_classes = (UserAccessPermission,)
+
+    def get(self, request, id):
+        print("id")
+        task = Task.objects.get(pk=id, assignee=request.user)
+        return Response(model_to_dict(task), status=status.HTTP_200_OK)
+    

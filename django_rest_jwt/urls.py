@@ -13,11 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.urls import include, re_path
+from django.urls import include, re_path, path
 from django.contrib import admin
-from authentication import urls as authentication_urls
-from home import urls as home_urls
-from task import urls as task_urls
+from authentication import views as auth_views
+from task import views as task_views
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -41,9 +40,10 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    re_path(r'^api/auth/', include(authentication_urls)),
-    re_path(r'^api/home/', include(home_urls)),
-    re_path(r'^api/tasks/', include(task_urls)),
+    re_path(r'^api/auth/register/', auth_views.RegistrationView.as_view(), name='register'),
+    re_path(r'^api/auth/login/', auth_views.LoginView.as_view(), name='login'),
+    path('api/tasks', task_views.TasksView.as_view()),
+    path('api/tasks/<int:id>', task_views.TaskView.as_view()),
     re_path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
