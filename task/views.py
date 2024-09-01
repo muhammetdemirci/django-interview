@@ -88,7 +88,7 @@ class TaskView(APIView):
         return Response("Deleted", status=status.HTTP_200_OK)
 
 class AdminTasksView(APIView):
-    authentication_classes = (AdminAuthentication)
+    authentication_classes = (AdminAuthentication,)
     permission_classes = (UserAccessPermission,)
 
     def get(self, request):
@@ -98,7 +98,7 @@ class AdminTasksView(APIView):
         return Response(qs_json, status=status.HTTP_200_OK)
 
 class AdminTaskView(APIView):
-    authentication_classes = (AdminAuthentication)
+    authentication_classes = (AdminAuthentication,)
     permission_classes = (UserAccessPermission,)
 
     @swagger_auto_schema(request_body=openapi.Schema(
