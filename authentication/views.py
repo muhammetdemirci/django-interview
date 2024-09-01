@@ -23,8 +23,23 @@ class RegistrationView(APIView):
             'email': openapi.Schema(type=openapi.TYPE_STRING, description='test@yopmail.com'),
             'username': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
             'password': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
-        }
-    ))
+        },
+    ), responses={
+        status.HTTP_405_METHOD_NOT_ALLOWED: "Email exist",
+        status.HTTP_201_CREATED: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                "email": openapi.Schema(type=openapi.TYPE_STRING),
+                "username": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        status.HTTP_400_BAD_REQUEST: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+            },
+        ),
+    })
     @transaction.atomic()
     def post(self, request):
         email = request.data.get('email', None)
@@ -60,7 +75,19 @@ class LoginView(APIView):
             'email': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
             'password': openapi.Schema(type=openapi.TYPE_STRING, description='string'),
         }
-    ))
+    ),responses={
+        status.HTTP_404_NOT_FOUND: "Email not exist",
+        status.HTTP_200_OK: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                "email": openapi.Schema(type=openapi.TYPE_STRING),
+                "username": openapi.Schema(type=openapi.TYPE_STRING),
+                "token": openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        status.HTTP_401_UNAUTHORIZED: "Invalid Credentials",
+    })
     def post(self, request):
         email = request.data.get('email', None)
         password = request.data.get('password', None)
