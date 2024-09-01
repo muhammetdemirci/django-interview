@@ -88,7 +88,7 @@ class TaskView(APIView):
         return Response("Deleted", status=status.HTTP_200_OK)
 
 class AdminTasksView(APIView):
-    authentication_classes = (UserAuthentication, AdminAuthentication)
+    authentication_classes = (AdminAuthentication)
     permission_classes = (UserAccessPermission,)
 
     def get(self, request):
