@@ -110,7 +110,7 @@ class TaskView(APIView):
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
         }
     ))
-    def post(self, request, id):
+    def patch(self, request, id):
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             title = request.data.get('title', None)
@@ -118,10 +118,14 @@ class TaskView(APIView):
             task_status = request.data.get('status', None)
             due_date = request.data.get('due_date', None)
             task = Task.objects.get(pk=id, assignee=request.user)
-            task.title = title
-            task.description = description
-            task.status = task_status
-            task.due_date = due_date
+            if (title):
+                task.title = title
+            if (description):
+                task.description = description
+            if (task_status):
+                task.status = task_status
+            if (due_date):
+                task.due_date = due_date
             task.save()
 
             send_task_update_notification.delay(request.user.email)
@@ -205,7 +209,7 @@ class AdminTaskView(APIView):
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
         }
     ))
-    def post(self, request, id):
+    def patch(self, request, id):
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             title = request.data.get('title', None)
@@ -213,10 +217,14 @@ class AdminTaskView(APIView):
             task_status = request.data.get('status', None)
             due_date = request.data.get('due_date', None)
             task = Task.objects.get(pk=id)
-            task.title = title
-            task.description = description
-            task.status = task_status
-            task.due_date = due_date
+            if (title):
+                task.title = title
+            if (description):
+                task.description = description
+            if (task_status):
+                task.status = task_status
+            if (due_date):
+                task.due_date = due_date
             task.save()
             
             send_task_update_notification.delay(task.user.email)
