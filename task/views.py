@@ -19,9 +19,7 @@ class TasksView(APIView):
 
     def get(self, request):
         tasks = Task.objects.filter(assignee=request.user)
-        qs_json = serializers.serialize('json', tasks)
-
-        return Response(qs_json, status=status.HTTP_200_OK)
+        return Response(tasks.values(), status=status.HTTP_200_OK)
     
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT, 
@@ -93,9 +91,8 @@ class AdminTasksView(APIView):
 
     def get(self, request):
         tasks = Task.objects.all()
-        qs_json = serializers.serialize('json', tasks)
 
-        return Response(qs_json, status=status.HTTP_200_OK)
+        return Response(tasks.values(), status=status.HTTP_200_OK)
 
 class AdminTaskView(APIView):
     authentication_classes = (AdminAuthentication,)
