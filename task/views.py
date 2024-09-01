@@ -18,7 +18,7 @@ class TasksView(APIView):
     permission_classes = (UserAccessPermission,)
 
     def get(self, request):
-        tasks = Task.objects.filter(assignee=request.user)
+        tasks = Task.objects.all()
         return Response(tasks.values(), status=status.HTTP_200_OK)
     
     @swagger_auto_schema(request_body=openapi.Schema(
