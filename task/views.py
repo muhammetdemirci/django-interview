@@ -17,8 +17,58 @@ class TasksView(APIView):
     authentication_classes = (UserAuthentication,)
     permission_classes = (UserAccessPermission,)
 
+   
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'title',
+                openapi.IN_QUERY,
+                description="Title",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'description',
+                openapi.IN_QUERY,
+                description="Description",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'task_status',
+                openapi.IN_QUERY,
+                description="Task Status, Options are PG, IG, CD",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'assignee_id',
+                openapi.IN_QUERY,
+                description="Assignee Id",
+                type=openapi.TYPE_NUMBER,
+            ),
+            openapi.Parameter(
+                'due_date',
+                openapi.IN_QUERY,
+                description="Due date, format must be YYYY-MM-DD",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+    )
     def get(self, request):
+        title = request.GET.get('title', '')
+        description = request.GET.get('description', '')
+        task_status = request.GET.get('task_status', '')
+        assignee_id = request.GET.get('assignee_id', None)
+        due_date = request.GET.get('due_date', None)
         tasks = Task.objects.all()
+        if title:
+            tasks = tasks.filter(title__icontains=title)
+        if description:
+            tasks = tasks.filter(description__icontains=description)
+        if task_status:
+            tasks = tasks.filter(status=task_status)
+        if assignee_id:
+            tasks = tasks.filter(assignee=assignee_id)
+        if due_date:
+            tasks = tasks.filter(due_date=due_date)
         return Response(tasks.values(), status=status.HTTP_200_OK)
     
     @swagger_auto_schema(request_body=openapi.Schema(
@@ -89,9 +139,57 @@ class AdminTasksView(APIView):
     authentication_classes = (AdminAuthentication,)
     permission_classes = (UserAccessPermission,)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'title',
+                openapi.IN_QUERY,
+                description="Title",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'description',
+                openapi.IN_QUERY,
+                description="Description",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'task_status',
+                openapi.IN_QUERY,
+                description="Task Status, Options are PG, IG, CD",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                'assignee_id',
+                openapi.IN_QUERY,
+                description="Assignee Id",
+                type=openapi.TYPE_NUMBER,
+            ),
+            openapi.Parameter(
+                'due_date',
+                openapi.IN_QUERY,
+                description="Due date, format must be YYYY-MM-DD",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+    )
     def get(self, request):
+        title = request.GET.get('title', '')
+        description = request.GET.get('description', '')
+        task_status = request.GET.get('task_status', '')
+        assignee_id = request.GET.get('assignee_id', None)
+        due_date = request.GET.get('due_date', None)
         tasks = Task.objects.all()
-
+        if title:
+            tasks = tasks.filter(title__icontains=title)
+        if description:
+            tasks = tasks.filter(description__icontains=description)
+        if task_status:
+            tasks = tasks.filter(status=task_status)
+        if assignee_id:
+            tasks = tasks.filter(assignee=assignee_id)
+        if due_date:
+            tasks = tasks.filter(due_date=due_date)
         return Response(tasks.values(), status=status.HTTP_200_OK)
 
 class AdminTaskView(APIView):
