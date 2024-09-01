@@ -51,6 +51,19 @@ class TasksView(APIView):
                 type=openapi.TYPE_STRING,
             ),
         ],
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                    "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "task_status": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assignee_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "due_date": openapi.Schema(type=openapi.TYPE_STRING),
+                },)
+            ),
+        }
     )
     def get(self, request):
         title = request.GET.get('title', '')
@@ -78,6 +91,18 @@ class TasksView(APIView):
             'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
             'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
+        },
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT, properties={
+                    "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "task_status": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assignee_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "due_date": openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            ),
         }
     ))
     def post(self, request):
@@ -97,6 +122,20 @@ class TaskView(APIView):
     authentication_classes = (UserAuthentication,)
     permission_classes = (UserAccessPermission,)
 
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT, properties={
+                    "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "task_status": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assignee_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "due_date": openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            ),
+        }
+    )
     def get(self, request, id):
         task = Task.objects.get(pk=id, assignee=request.user)
         return Response(model_to_dict(task), status=status.HTTP_200_OK)
@@ -109,7 +148,18 @@ class TaskView(APIView):
             'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
         }
-    ))
+    ), responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT, properties={
+                    "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "task_status": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assignee_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "due_date": openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            ),
+        })
     def patch(self, request, id):
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
@@ -176,6 +226,19 @@ class AdminTasksView(APIView):
                 type=openapi.TYPE_STRING,
             ),
         ],
+        responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                    "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "task_status": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assignee_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "due_date": openapi.Schema(type=openapi.TYPE_STRING),
+                },)
+            ),
+        }
     )
     def get(self, request):
         title = request.GET.get('title', '')
@@ -208,7 +271,18 @@ class AdminTaskView(APIView):
             'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
         }
-    ))
+    ), responses={
+            status.HTTP_200_OK: openapi.Schema(
+                type=openapi.TYPE_OBJECT, properties={
+                    "id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "title": openapi.Schema(type=openapi.TYPE_STRING),
+                    "description": openapi.Schema(type=openapi.TYPE_STRING),
+                    "task_status": openapi.Schema(type=openapi.TYPE_STRING),
+                    "assignee_id": openapi.Schema(type=openapi.TYPE_NUMBER),
+                    "due_date": openapi.Schema(type=openapi.TYPE_STRING),
+                }
+            ),
+    })
     def patch(self, request, id):
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
