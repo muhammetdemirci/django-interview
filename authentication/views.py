@@ -34,11 +34,7 @@ class RegistrationView(APIView):
                 "username": openapi.Schema(type=openapi.TYPE_STRING),
             },
         ),
-        status.HTTP_400_BAD_REQUEST: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-            },
-        ),
+        status.HTTP_400_BAD_REQUEST: "Return errors",
     })
     @transaction.atomic()
     def post(self, request):
