@@ -66,6 +66,9 @@ class TasksView(APIView):
         }
     )
     def get(self, request):
+        """
+            Get list of tasks
+        """
         title = request.GET.get('title', '')
         description = request.GET.get('description', '')
         task_status = request.GET.get('task_status', '')
@@ -106,6 +109,9 @@ class TasksView(APIView):
         }
     ))
     def post(self, request):
+        """
+            Create a new task
+        """
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             title = request.data.get('title', None)
@@ -161,6 +167,9 @@ class TaskView(APIView):
             ),
         })
     def patch(self, request, id):
+        """
+            Update a task
+        """
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             title = request.data.get('title', None)
@@ -188,6 +197,9 @@ class TaskView(APIView):
             status.HTTP_200_OK: "Deleted"
     })
     def delete(self, request, id):
+        """
+            Delete a task
+        """
         task = Task.objects.get(pk=id, assignee=request.user)
         task.delete()
         return Response("Deleted", status=status.HTTP_200_OK)
@@ -244,6 +256,9 @@ class AdminTasksView(APIView):
         }
     )
     def get(self, request):
+        """
+            Get tasks
+        """
         title = request.GET.get('title', '')
         description = request.GET.get('description', '')
         task_status = request.GET.get('task_status', '')
@@ -287,6 +302,9 @@ class AdminTaskView(APIView):
             ),
     })
     def patch(self, request, id):
+        """
+            Update a task
+        """
         serializer = TaskSerializer(data=request.data)
         if serializer.is_valid():
             title = request.data.get('title', None)
@@ -313,6 +331,9 @@ class AdminTaskView(APIView):
             status.HTTP_200_OK: "Deleted"
     })
     def delete(self, request, id):
+        """
+            Delete a task
+        """
         task = Task.objects.get(pk=id)
         task.delete()
         return Response("Deleted", status=status.HTTP_200_OK)
