@@ -98,7 +98,7 @@ class AdminTasksView(APIView):
         return Response(qs_json, status=status.HTTP_200_OK)
 
 class AdminTaskView(APIView):
-    authentication_classes = (UserAuthentication, AdminAuthentication)
+    authentication_classes = (AdminAuthentication)
     permission_classes = (UserAccessPermission,)
 
     @swagger_auto_schema(request_body=openapi.Schema(

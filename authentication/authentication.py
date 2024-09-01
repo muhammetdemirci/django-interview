@@ -33,7 +33,7 @@ class AdminAuthentication(authentication.BaseAuthentication):
                 username = JWTHelper.decode_token(token)
                 try:
                     user = User.objects.get(username=username)
-                    if user.is_superuser != 'admin':
+                    if not user.is_superuser:
                         raise exceptions.AuthenticationFailed('It is not super user')
                 except User.DoesNotExist:
                     raise exceptions.AuthenticationFailed('No such user')
