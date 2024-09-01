@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from authentication.authentication import UserAuthentication, AdminAuthentication
 from authentication.permission import UserAccessPermission
-from django.core import serializers
+from django.contrib.auth import get_user_model
+
 
 from task.serializers import TaskSerializer
 from task.models import Task
@@ -94,6 +95,7 @@ class TasksView(APIView):
             'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
             'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
+            'assignee_id': openapi.Schema(type=openapi.TYPE_NUMBER, description='number'),
         },
         responses={
             status.HTTP_200_OK: openapi.Schema(
@@ -118,8 +120,13 @@ class TasksView(APIView):
             description = request.data.get('description', None)
             task_status = request.data.get('status', None)
             due_date = request.data.get('due_date', None)
+            assignee_id = request.data.get('assignee_id', None)
+
+            UserModel = get_user_model()
+
+            user = UserModel.objects.get(pk=assignee_id)
             
-            task = Task.objects.create(title=title,description=description, status=task_status, assignee=request.user, due_date=due_date)
+            task = Task.objects.create(title=title,description=description, status=task_status, assignee=user, due_date=due_date)
             send_task_assignment_notification.delay(request.user.email)
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -143,6 +150,9 @@ class TaskView(APIView):
         }
     )
     def get(self, request, id):
+        """
+            Get assigned task by id
+        """
         task = Task.objects.get(pk=id, assignee=request.user)
         return Response(model_to_dict(task), status=status.HTTP_200_OK)
     
@@ -153,6 +163,7 @@ class TaskView(APIView):
             'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
             'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
+            'assignee_id': openapi.Schema(type=openapi.TYPE_NUMBER, description='assignee_id'),
         }
     ), responses={
             status.HTTP_200_OK: openapi.Schema(
@@ -170,27 +181,28 @@ class TaskView(APIView):
         """
             Update a task
         """
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            title = request.data.get('title', None)
-            description = request.data.get('description', None)
-            task_status = request.data.get('status', None)
-            due_date = request.data.get('due_date', None)
-            task = Task.objects.get(pk=id, assignee=request.user)
-            if (title):
-                task.title = title
-            if (description):
-                task.description = description
-            if (task_status):
-                task.status = task_status
-            if (due_date):
-                task.due_date = due_date
-            task.save()
-
-            send_task_update_notification.delay(request.user.email)
-
-            return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        title = request.data.get('title', None)
+        description = request.data.get('description', None)
+        task_status = request.data.get('status', None)
+        due_date = request.data.get('due_date', None)
+        assignee_id = request.data.get('assignee_id', None)
+        
+        task = Task.objects.get(pk=id, assignee=request.user)
+        if (title):
+            task.title = title
+        if (description):
+            task.description = description
+        if (task_status):
+            task.status = task_status
+        if (due_date):
+            task.due_date = due_date
+        if (assignee_id):
+            UserModel = get_user_model()
+            user = UserModel.objects.get(pk=assignee_id)
+            task.assignee = user
+        task.save()
+        send_task_update_notification.delay(request.user.email)
+        return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
     
 
     @swagger_auto_schema(responses={
@@ -288,6 +300,7 @@ class AdminTaskView(APIView):
             'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
             'status': openapi.Schema(type=openapi.TYPE_STRING, description='status'),
             'due_date': openapi.Schema(type=openapi.TYPE_STRING, description='due_date'),
+            'assignee_id': openapi.Schema(type=openapi.TYPE_NUMBER, description='number'),
         }
     ), responses={
             status.HTTP_200_OK: openapi.Schema(
@@ -305,27 +318,29 @@ class AdminTaskView(APIView):
         """
             Update a task
         """
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            title = request.data.get('title', None)
-            description = request.data.get('description', None)
-            task_status = request.data.get('status', None)
-            due_date = request.data.get('due_date', None)
-            task = Task.objects.get(pk=id)
-            if (title):
-                task.title = title
-            if (description):
-                task.description = description
-            if (task_status):
-                task.status = task_status
-            if (due_date):
-                task.due_date = due_date
-            task.save()
-            
-            send_task_update_notification.delay(task.user.email)
-
-            return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        title = request.data.get('title', None)
+        description = request.data.get('description', None)
+        task_status = request.data.get('status', None)
+        due_date = request.data.get('due_date', None)
+        assignee_id = request.data.get('assignee_id', None)
+        
+        task = Task.objects.get(pk=id)
+        if (title):
+            task.title = title
+        if (description):
+            task.description = description
+        if (task_status):
+            task.status = task_status
+        if (due_date):
+            task.due_date = due_date
+        if (assignee_id):
+            UserModel = get_user_model()
+            user = UserModel.objects.get(pk=assignee_id)
+            task.assignee = user
+        task.save()
+        
+        send_task_update_notification.delay(task.user.email)
+        return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
     
     @swagger_auto_schema(responses={
             status.HTTP_200_OK: "Deleted"
