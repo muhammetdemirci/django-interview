@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from authentication.authentication import UserAuthentication
+from authentication.authentication import UserAuthentication, AdminAuthentication
 from authentication.permission import UserAccessPermission
 from django.core import serializers
 
@@ -88,7 +88,7 @@ class TaskView(APIView):
         return Response("Deleted", status=status.HTTP_200_OK)
 
 class AdminTasksView(APIView):
-    authentication_classes = (UserAuthentication,)
+    authentication_classes = (UserAuthentication, AdminAuthentication)
     permission_classes = (UserAccessPermission,)
 
     def get(self, request):
@@ -98,7 +98,7 @@ class AdminTasksView(APIView):
         return Response(qs_json, status=status.HTTP_200_OK)
 
 class AdminTaskView(APIView):
-    authentication_classes = (UserAuthentication,)
+    authentication_classes = (UserAuthentication, AdminAuthentication)
     permission_classes = (UserAccessPermission,)
 
     @swagger_auto_schema(request_body=openapi.Schema(

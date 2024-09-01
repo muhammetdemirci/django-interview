@@ -21,3 +21,22 @@ class UserAuthentication(authentication.BaseAuthentication):
                 return user, None
             raise exceptions.AuthenticationFailed(message)
         raise exceptions.AuthenticationFailed('No token provided')
+    
+class AdminAuthentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        if 'HTTP_AUTHORIZATION' in request.META:
+            token = request.META.get('HTTP_AUTHORIZATION').replace("Bearer ", "")
+            if not token:
+                raise exceptions.AuthenticationFailed('No token provided')
+            is_valid, message = JWTHelper.is_token_valid(token)
+            if is_valid:
+                username = JWTHelper.decode_token(token)
+                try:
+                    user = User.objects.get(username=username)
+                    if user.is_superuser != 'admin':
+                        raise exceptions.AuthenticationFailed('It is not super user')
+                except User.DoesNotExist:
+                    raise exceptions.AuthenticationFailed('No such user')
+                return user, None
+            raise exceptions.AuthenticationFailed(message)
+        raise exceptions.AuthenticationFailed('No token provided')
