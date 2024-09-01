@@ -184,6 +184,9 @@ class TaskView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+    @swagger_auto_schema(responses={
+            status.HTTP_200_OK: "Deleted"
+    })
     def delete(self, request, id):
         task = Task.objects.get(pk=id, assignee=request.user)
         task.delete()
@@ -306,7 +309,9 @@ class AdminTaskView(APIView):
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+    @swagger_auto_schema(responses={
+            status.HTTP_200_OK: "Deleted"
+    })
     def delete(self, request, id):
         task = Task.objects.get(pk=id)
         task.delete()
