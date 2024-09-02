@@ -153,7 +153,7 @@ class TaskView(APIView):
         """
             Get assigned task by id
         """
-        task = Task.objects.get(pk=id, assignee=request.user)
+        task = Task.objects.get(pk=id)
         return Response(model_to_dict(task), status=status.HTTP_200_OK)
     
     @swagger_auto_schema(request_body=openapi.Schema(
