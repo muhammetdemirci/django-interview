@@ -127,7 +127,7 @@ class TasksView(APIView):
             user = UserModel.objects.get(pk=assignee_id)
             
             task = Task.objects.create(title=title,description=description, status=task_status, assignee=user, due_date=due_date)
-            send_task_assignment_notification.delay(request.user.email)
+            send_task_assignment_notification.delay(user.email)
             return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
