@@ -201,7 +201,7 @@ class TaskView(APIView):
             user = UserModel.objects.get(pk=assignee_id)
             task.assignee = user
         task.save()
-        send_task_update_notification.delay(request.user.email)
+        send_task_update_notification.delay(request.assignee.email)
         return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
     
 
@@ -339,7 +339,7 @@ class AdminTaskView(APIView):
             task.assignee = user
         task.save()
         
-        send_task_update_notification.delay(task.user.email)
+        send_task_update_notification.delay(task.assignee.email)
         return Response(model_to_dict(task), status=status.HTTP_201_CREATED)
     
     @swagger_auto_schema(responses={
